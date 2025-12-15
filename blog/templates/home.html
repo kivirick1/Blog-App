@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Ana Sayfa - BlogApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-0">
+            <i class="bi bi-newspaper"></i> Bloglar
+          </h2>
+          <small class="text-muted">Toplam {{ blogs.count }} blog</small>
+        </div>
+        {% if user.is_authenticated and user.is_staff %}
+          <a href="{% url 'blog_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Yeni Blog Oluştur
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    {% for blog in blogs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm hover-shadow">
+          <img src="{{ blog.image }}" class="card-img-top" alt="{{ blog.title }}" style="height: 200px; object-fit: cover;">
+          <div class="card-body d-flex flex-column">
+            <div class="mb-2">
+              <span class="badge bg-primary">{{ blog.category.name }}</span>
+              {% if user.is_staff and blog.status == 'd' %}
+                <span class="badge bg-warning text-dark">Taslak</span>
+              {% endif %}
+            </div>
+            
+            <h5 class="card-title">{{ blog.title }}</h5>
+            <p class="card-text text-muted flex-grow-1">{{ blog.content|truncatewords:20 }}</p>
+            
+            <div class="d-flex justify-content-between align-items-center text-muted small mb-3">
+              <span>
+                <i class="bi bi-person"></i> {{ blog.user.username }}
+              </span>
+              <span>
+                <i class="bi bi-calendar"></i> {{ blog.publish_date|date:"d M Y" }}
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="text-muted small">
+                <span class="me-3">
+                  <i class="bi bi-eye"></i> {{ blog.get_view_count }}
+                </span>
+                <span class="me-3">
+                  <i class="bi bi-heart"></i> {{ blog.get_like_count }}
+                </span>
+                <span>
+                  <i class="bi bi-chat"></i> {{ blog.get_comment_count }}
+                </span>
+              </div>
+            </div>
+
+            <a href="{% url 'blog_detail' blog.slug %}" class="btn btn-outline-primary w-100">
+              <i class="bi bi-book"></i> Devamını Oku
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="bi bi-info-circle"></i> Henüz blog yayınlanmamış.
+          {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'blog_create' %}" class="alert-link">İlk blogu oluştur.</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .hover-shadow {
+    transition: all 0.3s ease;
+  }
+  .hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+</style>
+{% endblock %}

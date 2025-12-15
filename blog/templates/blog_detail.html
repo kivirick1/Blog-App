@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.title }} - BlogApp{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h1 class="mb-0">{{ blog.title }}</h1>
+    {% if user.is_authenticated and user == blog.user or user.is_staff %}
+      <div class="d-flex gap-2">
+        <a href="{% url 'blog_update' blog.slug %}" class="btn btn-warning btn-sm">
+          <i class="bi bi-pencil"></i> Düzenle
+        </a>
+        <a href="{% url 'blog_delete' blog.slug %}" class="btn btn-danger btn-sm">
+          <i class="bi bi-trash"></i> Sil
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    <img
+      src="{{ blog.image }}"
+      class="img-fluid rounded w-100"
+      alt="{{ blog.title }}"
+      style="max-height: 420px; object-fit: cover;"
+    >
+  </div>
+
+  <div class="mb-3">
+    <span class="badge bg-primary">{{ blog.category.name }}</span>
+    {% if user.is_staff %}
+      {% if blog.status == 'p' %}
+        <span class="badge bg-success">{{ blog.get_status_display }}</span>
+      {% else %}
+        <span class="badge bg-warning text-dark">{{ blog.get_status_display }}</span>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="text-muted mb-3">
+    <small>
+      <i class="bi bi-person"></i> {{ blog.user.username }} |
+      <i class="bi bi-calendar"></i> {{ blog.publish_date|date:"d M Y" }} |
+      <i class="bi bi-eye"></i> {{ blog.get_view_count }} görüntüleme |
+      <i class="bi bi-chat"></i> {{ blog.get_comment_count }} yorum
+    </small>
+  </div>
+
+  <div class="mb-4">
+    {{ blog.content|linebreaks }}
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="mb-4">
+      <a href="{% url 'like_toggle' blog.slug %}" class="btn btn-outline-danger">
+        {% if user_liked %}
+          <i class="bi bi-heartbreak"></i> Beğenmekten Vazgeç ({{ blog.get_like_count }})
+        {% else %}
+          <i class="bi bi-heart"></i> Beğen ({{ blog.get_like_count }})
+        {% endif %}
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<hr class="my-4">
+
+<div>
+  <h4 class="mb-3">Yorumlar ({{ comments.count }})</h4>
+
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'comment_create' blog.slug %}" class="mb-4">
+      {% csrf_token %}
+      <div class="mb-3">
+        <textarea name="content" class="form-control" rows="3" placeholder="Yorumunuzu yazın..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Yorum Yap</button>
+    </form>
+  {% else %}
+    <p class="text-muted">Yorum yapmak için giriş yapmalısınız.</p>
+  {% endif %}
+
+  <div class="list-group">
+    {% for comment in comments %}
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <div class="fw-semibold">
+              <i class="bi bi-person-circle"></i> {{ comment.user.username }}
+              <small class="text-muted">- {{ comment.time_stamp|date:"d M Y H:i" }}</small>
+            </div>
+            <div>{{ comment.content }}</div>
+          </div>
+          <div class="d-flex gap-2">
+            {% if user == comment.user %}
+              <a href="{% url 'comment_update' comment.pk %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i>
+              </a>
+            {% endif %}
+            {% if user == comment.user or user.is_staff %}
+              <form method="post" action="{% url 'comment_delete' comment.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="text-muted">Henüz yorum yapılmamış.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

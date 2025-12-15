@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if category %}Kategori Düzenle{% else %}Yeni Kategori{% endif %} - BlogApp{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>{% if category %}Kategori Düzenle{% else %}Yeni Kategori Oluştur{% endif %}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="name" class="form-label">Kategori Adı</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="name" 
+                name="name" 
+                value="{% if category %}{{ category.name }}{% endif %}"
+                required
+              >
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'category_list' %}" class="btn btn-secondary">
+                İptal
+              </a>
+              <button type="submit" class="btn btn-primary">
+                {% if category %}Güncelle{% else %}Oluştur{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

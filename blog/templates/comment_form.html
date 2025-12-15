@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Yorumu Düzenle - BlogApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="mb-4">
+    <h3>
+      <i class="bi bi-pencil-square"></i> Yorumu Düzenle
+    </h3>
+    <small class="text-muted">Blog: {{ comment.blog.title }}</small>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="content" class="form-label fw-bold">Yorum</label>
+      <textarea
+        id="content"
+        name="content"
+        class="form-control"
+        rows="5"
+        required
+      >{{ comment.content }}</textarea>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="{% url 'blog_detail' comment.blog.slug %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Geri Dön
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-check-circle"></i> Kaydet
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

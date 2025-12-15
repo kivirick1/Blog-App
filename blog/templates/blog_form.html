@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if blog %}Blog Düzenle{% else %}Yeni Blog{% endif %} - BlogApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+  <div class="mb-4">
+    <h3>
+      <i class="bi bi-{% if blog %}pencil-square{% else %}plus-circle{% endif %}"></i>
+      {% if blog %}Blog Düzenle{% else %}Yeni Blog Oluştur{% endif %}
+    </h3>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label for="title" class="form-label fw-bold">Başlık</label>
+      <input 
+        type="text" 
+        class="form-control form-control-lg" 
+        id="title" 
+        name="title" 
+        value="{% if blog %}{{ blog.title }}{% endif %}"
+        placeholder="Blog başlığını girin..."
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="content" class="form-label fw-bold">İçerik</label>
+      <textarea 
+        class="form-control" 
+        id="content" 
+        name="content" 
+        rows="15" 
+        placeholder="Blog içeriğini yazın..."
+        required
+      >{% if blog %}{{ blog.content }}{% endif %}</textarea>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="image" class="form-label fw-bold">Görsel URL</label>
+        <input 
+          type="url" 
+          class="form-control" 
+          id="image" 
+          name="image" 
+          value="{% if blog %}{{ blog.image }}{% endif %}"
+          placeholder="https://example.com/image.jpg"
+          required
+        >
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label for="category" class="form-label fw-bold">Kategori</label>
+        <select class="form-select" id="category" name="category" required>
+          <option value="">Kategori Seçin</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if blog and blog.category.id == cat.id %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if user.is_staff %}
+        <div class="col-md-3 mb-3">
+          <label for="status" class="form-label fw-bold">Durum</label>
+          <select class="form-select" id="status" name="status">
+            <option value="d" {% if blog and blog.status == 'd' %}selected{% endif %}>Taslak</option>
+            <option value="p" {% if blog and blog.status == 'p' %}selected{% endif %}>Yayınlandı</option>
+          </select>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <a href="{% if blog %}{% url 'blog_detail' blog.slug %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-secondary">
+        <i class="bi bi-x-circle"></i> İptal
+      </a>
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="bi bi-{% if blog %}check-circle{% else %}plus-circle{% endif %}"></i>
+        {% if blog %}Güncelle{% else %}Oluştur{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

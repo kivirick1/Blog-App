@@ -1,0 +1,295 @@
+<style>
+  .nav-login-input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+    opacity: 1;
+  }
+  .hamburger-fab {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  @media (min-width: 992px) {
+    .sidebar-desktop {
+      width: 25%;
+    }
+  }
+</style>
+
+<button
+  class="btn btn-outline-light d-lg-none position-fixed hamburger-fab"
+  type="button"
+  data-bs-toggle="offcanvas"
+  data-bs-target="#mobileSidebar"
+  aria-controls="mobileSidebar"
+  style="bottom: 16px; right: 16px; z-index: 1060; background-color: #2c3e50;"
+>
+  <i class="bi bi-list"></i>
+</button>
+
+<div
+  class="offcanvas offcanvas-start d-lg-none"
+  tabindex="-1"
+  id="mobileSidebar"
+  aria-labelledby="mobileSidebarLabel"
+  style="background-color: #2c3e50; color: white;"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileSidebarLabel">
+      <i class="bi bi-journal-richtext"></i> BlogApp
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-3">
+    {% if request.user.is_authenticated %}
+      <div class="d-flex flex-column justify-content-center align-items-center mb-3">
+        <img 
+          style="border-radius: 50%; width: 80px;"
+          class="border border-info p-1"
+          alt="avatar"
+          src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+        >
+        <span class="text-center fw-bold mt-2">{{request.user.first_name}} {{request.user.last_name}}</span>
+        <small class="text-center text-white-50">
+          @{{request.user.username}}
+          {% if request.user.is_staff or request.user.is_superuser %}
+            <i class="bi bi-shield-fill-check text-warning" title="Yönetici"></i>
+          {% endif %}
+        </small>
+      </div>
+
+      <div class="d-grid gap-2 mb-3">
+        <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-house"></i> Ana Sayfa
+        </a>
+        {% if request.user.is_staff %}
+          <a href="{% url 'blog_create' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-plus-circle"></i> Yeni Blog
+          </a>
+          <a href="{% url 'category_list' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-tags"></i> Kategoriler
+          </a>
+        {% endif %}
+      </div>
+
+      <a href="{% url 'logout' %}" class="btn btn-danger btn-sm w-100">
+        <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+      </a>
+    {% else %}
+      <div class="text-center mb-3">
+        <div class="mb-3">
+          <i class="bi bi-person-circle text-white-50" style="font-size: 3rem;"></i>
+        </div>
+        <h6 class="mb-1">Hoş Geldiniz</h6>
+        <small class="text-white-50">Devam etmek için giriş yapın</small>
+      </div>
+
+      <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-secondary text-white-50">
+              <i class="bi bi-person"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control bg-transparent text-white border-secondary nav-login-input"
+              id="username_mobile"
+              name="username"
+              placeholder="Kullanıcı Adı"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-secondary text-white-50">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input
+              type="password"
+              class="form-control bg-transparent text-white border-secondary nav-login-input"
+              id="password_mobile"
+              name="password"
+              placeholder="Parola"
+              required
+            >
+          </div>
+        </div>
+      
+        <div class="d-grid">
+          <button type="submit" class="btn btn-outline-light">
+            <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-3">
+        <small class="text-white-50">Hesabın yok mu?</small>
+        <a href="{% url 'register' %}" class="link-light fw-semibold">Kayıt Ol</a>
+      </div>
+    {% endif %}
+
+    <hr class="my-3">
+
+    <div class="mb-2">
+      <h6 class="text-center">
+        <i class="bi bi-tags"></i> Kategoriler
+      </h6>
+    </div>
+
+    <div class="d-flex flex-column gap-2">
+      <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm {% if not selected_category %}active{% endif %}">
+        <i class="bi bi-grid"></i> Tümü
+      </a>
+      {% for category in categories %}
+        <a href="{% url 'home' %}?category={{ category.id }}" class="btn btn-outline-light btn-sm {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+          <i class="bi bi-tag"></i> {{category.name}}
+        </a>
+      {% empty %}
+        <small class="text-white-50 text-center">Kategori yok</small>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div
+  class="sidebar-desktop d-none d-lg-block col-lg-3 p-3 vh-100 position-fixed overflow-auto"
+  style="top: 0; left: 0; margin: 0 !important;"
+>
+  <div class="card h-100 w-100 text-white" style="background-color: #2c3e50;">
+    <div class="d-flex flex-column card-body p-3">
+      
+      <div class="text-center mb-3">
+        <h4 class="mb-0">
+          <i class="bi bi-journal-richtext"></i> BlogApp
+        </h4>
+      </div>
+
+      <hr class="my-2">
+
+      {% if request.user.is_authenticated %}
+        <div class="d-flex flex-column justify-content-center align-items-center mb-3">
+          <img 
+            style="border-radius: 50%; width: 80px;"
+            class="border border-info p-1"
+            alt="avatar"
+            src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+          >
+          <span class="text-center fw-bold mt-2">{{request.user.first_name}} {{request.user.last_name}}</span>
+          <small class="text-center text-white-50">
+            @{{request.user.username}}
+            {% if request.user.is_staff or request.user.is_superuser %}
+              <i class="bi bi-shield-fill-check text-warning" title="Yönetici"></i>
+            {% endif %}
+          </small>
+        </div>
+
+        <div class="d-grid gap-2 mb-3">
+          <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-house"></i> Ana Sayfa
+          </a>
+          {% if request.user.is_staff %}
+            <a href="{% url 'blog_create' %}" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-plus-circle"></i> Yeni Blog
+            </a>
+          {% endif %}
+          {% if request.user.is_staff %}
+            <a href="{% url 'category_list' %}" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-tags"></i> Kategoriler
+            </a>
+          {% endif %}
+        </div>
+
+        <hr class="my-2">
+
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">
+          <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+        </a>
+      {% else %}
+        <div class="text-center mb-3">
+          <div class="mb-3">
+            <i class="bi bi-person-circle text-white-50" style="font-size: 3rem;"></i>
+          </div>
+          <h6 class="mb-1">Hoş Geldiniz</h6>
+          <small class="text-white-50">Devam etmek için giriş yapın</small>
+        </div>
+
+        <form action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary text-white-50">
+                <i class="bi bi-person"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control bg-transparent text-white border-secondary nav-login-input"
+                id="username"
+                name="username"
+                placeholder="Kullanıcı Adı"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary text-white-50">
+                <i class="bi bi-lock"></i>
+              </span>
+              <input
+                type="password"
+                class="form-control bg-transparent text-white border-secondary nav-login-input"
+                id="password"
+                name="password"
+                placeholder="Parola"
+                required
+              >
+            </div>
+          </div>
+        
+          <div class="d-grid">
+            <button type="submit" class="btn btn-outline-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-3">
+          <small class="text-white-50">Hesabın yok mu?</small>
+          <a href="{% url 'register' %}" class="link-light fw-semibold">Kayıt Ol</a>
+        </div>
+      {% endif %}
+
+      <hr class="my-2">
+
+      <div class="mb-2">
+        <h6 class="text-center">
+          <i class="bi bi-tags"></i> Kategoriler
+        </h6>
+      </div>
+
+      <div class="d-flex flex-column gap-2">
+        <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm {% if not selected_category %}active{% endif %}">
+          <i class="bi bi-grid"></i> Tümü
+        </a>
+        {% for category in categories %}
+          <a href="{% url 'home' %}?category={{ category.id }}" class="btn btn-outline-light btn-sm {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+            <i class="bi bi-tag"></i> {{category.name}}
+          </a>
+        {% empty %}
+          <small class="text-white-50 text-center">Kategori yok</small>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>

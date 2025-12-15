@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Kayıt Ol - BlogApp{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="mb-4">
+    <h3>
+      <i class="bi bi-person-plus"></i> Kayıt Ol
+    </h3>
+    <small class="text-muted">Yeni hesap oluştur</small>
+  </div>
+
+  <form method="post" class="row g-3">
+    {% csrf_token %}
+
+    <div class="col-md-6">
+      <label for="first_name" class="form-label fw-bold">Ad</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Ad">
+    </div>
+
+    <div class="col-md-6">
+      <label for="last_name" class="form-label fw-bold">Soyad</label>
+      <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Soyad">
+    </div>
+
+    <div class="col-12">
+      <label for="username" class="form-label fw-bold">Kullanıcı Adı</label>
+      <input type="text" class="form-control" id="username" name="username" placeholder="Kullanıcı Adı" required>
+    </div>
+
+    <div class="col-md-6">
+      <label for="password1" class="form-label fw-bold">Şifre</label>
+      <input type="password" class="form-control" id="password1" name="password1" placeholder="Şifre" required>
+    </div>
+
+    <div class="col-md-6">
+      <label for="password2" class="form-label fw-bold">Şifre (Tekrar)</label>
+      <input type="password" class="form-control" id="password2" name="password2" placeholder="Şifre (Tekrar)" required>
+    </div>
+
+    <div class="col-12 d-flex justify-content-between align-items-center mt-2">
+      <a href="{% url 'home' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Geri Dön
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-check-circle"></i> Kayıt Ol
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
