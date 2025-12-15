@@ -47,7 +47,5 @@
  
  ## Demo Yönetici Bilgileri
  
- Eğer sistemde hiç admin yoksa `seed_demo` komutu otomatik olarak demo admin oluşturabilir:
- 
  - **Kullanıcı Adı:** admin
  - **Şifre:** admin123
